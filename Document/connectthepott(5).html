@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html>
+    <h1>Garbage Recognition</h1>
+    <body style="background-color:#C0C0C0;">
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
+      <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
+      <script type="text/javascript">
+        // Classifier Variable
+        let classifier;
+        // Model URL
+        let imageModelURL = 'https://teachablemachine.withgoogle.com/models/qGbmjq7q/';
+        
+        // Video
+        let video;
+        let flippedVideo;
+        // To store the classification
+        let label = "";
+      
+        // Load the model first
+        function preload() {
+          classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+        }
+      
+        function setup() {
+          createCanvas(420, 335);
+          // Create the video
+          video = createCapture(VIDEO);
+          video.size(420, 315);
+          video.hide();
+      
+          flippedVideo = ml5.flipImage(video)
+          // Start classifying
+          classifyVideo();
+        }
+      
+        function draw() {
+          background(0);
+          // Draw the video
+          image(flippedVideo, 0, 0);
+      
+          // Draw the label
+          fill(255);
+          textSize(16);
+          textAlign(CENTER);
+          text(label, width / 2, height - 4);
+        }
+      
+        // Get a prediction for the current video frame
+        function classifyVideo() {
+          flippedVideo = ml5.flipImage(video)
+          classifier.classify(flippedVideo, gotResult);
+        }
+      
+        // When we get a result
+        function gotResult(error, results) {
+          // If there is an error
+          if (error) {
+            console.error(error);
+            return;
+          }
+          // The results are in an array ordered by confidence.
+          // console.log(results[0]);
+          switch(label){
+            case "Plastic" : x = "Wait!!! (＞x＜)"+"&nbsp;&nbsp"+" Don't throw it away yet, <br>if there is a recycling icon => You can get 25 cents back!<br>you should drop this into : Yellow Bins"+ " &nbsp;&nbsp" + ":)";
+            break;
+            case "Paper" : x = "you should drop this into : Blue Bins!"+ " &nbsp;&nbsp" + ":)";
+            break;
+            case "Glass" : x = "you should drop this into : Special Bins!"+ " &nbsp;&nbsp" + ":)";
+            break;
+            case "Metal" : x = "Wait!!! (＞x＜) "+"&nbsp;&nbsp"+" Don't throw it away yet, <br>if there is a recycling icon => You can get 25 cents back!<br>you should drop this into : Black Bins"+ " &nbsp;&nbsp" + ":)";
+            break;
+            case "Packaging" : x = "you should drop this into : Yellow Bins!"+ " &nbsp;&nbsp" + ":)";
+            break;
+            case "Surranding" : x = "sorry, we can't identify it yet (＞﹏＜) !!";
+            break;
+            default : x = "Others..."
+            
+          }
+          document.getElementById("demo").style.color = "#8B4513";
+          document.getElementById("demo").style.fontFamily = "Hiragino Sans GB";
+          document.getElementById("demo").innerHTML=x;
+          // Classifiy again!
+          classifyVideo();
+        }
+      </script>
+      <p id = "demo"></p>
+    </body>
+    
+    
+
+</html>
